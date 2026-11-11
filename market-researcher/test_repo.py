@@ -30,7 +30,15 @@ def every_text_file():
 class Repo(unittest.TestCase):
     def test_root_matches_the_reel(self):
         root = sorted(d for d in os.listdir(ROOT) if d not in (".git", ".gitignore", ".DS_Store", "whale", "__pycache__"))
-        self.assertEqual(root, sorted([".claude-plugin", "LICENSE", "README.md"] + SKILLS))
+        self.assertEqual(root, sorted([".claude", ".claude-plugin", "LICENSE", "README.md"] + SKILLS))
+
+    def test_project_skills_link_to_every_skill(self):
+        # .claude/skills makes the eleven available as project skills when this repo is opened in Claude Code
+        links = os.path.join(ROOT, ".claude", "skills")
+        self.assertEqual(sorted(os.listdir(links)), sorted(SKILLS))
+        for s in SKILLS:
+            self.assertEqual(os.readlink(os.path.join(links, s)), "../../" + s, s)
+            self.assertTrue(os.path.isfile(os.path.join(links, s, "SKILL.md")), s)
 
     def test_frontmatter_name_and_description(self):
         for s in SKILLS:
